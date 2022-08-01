@@ -75,39 +75,39 @@ describe("/transactions route", () => {
     });
 
     it("should return status 401 for not admin's token", async () => {
-        const data = {
-          userId: "c486ab55-5c4b-4689-8f57-ace155ea65b4",
-          cardNumber: "111111111111",
-          amount: 50,
-        };
-  
-        const token = jwt.sign({ type: "client" }, process.env.JWT_SECRET);
-        const { status, body } = await chai
-          .request(app)
-          .post("/transactions")
-          .set("authorization", `Bearer ${token}`)
-          .send(data);
-  
-        expect(status).to.be.equal(401);
-        expect(body.error).to.be.equal("Not Authorized");
-      });
+      const data = {
+        userId: "c486ab55-5c4b-4689-8f57-ace155ea65b4",
+        cardNumber: "111111111111",
+        amount: 50,
+      };
 
-      it("should return status 400 if user does not exist", async () => {
-        const data = {
-          userId: "5d16d28f-f190-4e74-89bb-0fc1455d7cc6",
-          cardNumber: "111111111111",
-          amount: 50,
-        };
-  
-        const token = jwt.sign({ type: "admin" }, process.env.JWT_SECRET);
-        const { status, body } = await chai
-          .request(app)
-          .post("/transactions")
-          .set("authorization", `Bearer ${token}`)
-          .send(data);
-  
-        expect(status).to.be.equal(400);
-        expect(body.error).to.be.equal("User does not exist");
-      });
+      const token = jwt.sign({ type: "client" }, process.env.JWT_SECRET);
+      const { status, body } = await chai
+        .request(app)
+        .post("/transactions")
+        .set("authorization", `Bearer ${token}`)
+        .send(data);
+
+      expect(status).to.be.equal(401);
+      expect(body.error).to.be.equal("Not Authorized");
+    });
+
+    it("should return status 400 if user does not exist", async () => {
+      const data = {
+        userId: "5d16d28f-f190-4e74-89bb-0fc1455d7cc6",
+        cardNumber: "111111111111",
+        amount: 50,
+      };
+
+      const token = jwt.sign({ type: "admin" }, process.env.JWT_SECRET);
+      const { status, body } = await chai
+        .request(app)
+        .post("/transactions")
+        .set("authorization", `Bearer ${token}`)
+        .send(data);
+
+      expect(status).to.be.equal(400);
+      expect(body.error).to.be.equal("User does not exist");
+    });
   });
 });
