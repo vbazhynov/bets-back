@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const dbConfig = {
+const dbConfig = {
   development: {
     client: "postgresql",
     connection: {
@@ -25,3 +25,5 @@ export const dbConfig = {
     },
   },
 };
+
+export default dbConfig;

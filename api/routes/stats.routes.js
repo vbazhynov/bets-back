@@ -4,7 +4,6 @@ const router = Router();
 router.get("/", (req, res) => {
   try {
     let token = req.headers["authorization"];
-    console.log(token);
     if (!token) {
       return res.status(401).send({ error: "Not Authorized" });
     }

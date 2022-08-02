@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import knex from "knex";
+import dbConfig from "./knexfile.js";
 import jwt from "jsonwebtoken";
 import joi from "joi";
 import ee from "events";
@@ -47,4 +48,4 @@ app.listen(port, () => {
 
 // Do not change this line
 
-export { app };
+export default app;
