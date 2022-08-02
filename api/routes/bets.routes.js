@@ -1,22 +1,12 @@
 import { Router } from "express";
+import { validateBody } from "../../middleware/validator/validator.js";
+import jwt from "jsonwebtoken";
+import { db } from "../../index.js";
+import { camelCaseIndexes } from "../../helpers/camelCaseIndexes.js";
 
 const router = Router();
 
-router.post("/", (req, res) => {
-  var schema = joi
-    .object({
-      id: joi.string().uuid(),
-      eventId: joi.string().uuid().required(),
-      betAmount: joi.number().min(1).required(),
-      prediction: joi.string().valid("w1", "w2", "x").required(),
-    })
-    .required();
-  var isValidResult = schema.validate(req.body);
-  if (isValidResult.error) {
-    res.status(400).send({ error: isValidResult.error.details[0].message });
-    return;
-  }
-
+router.post("/", validateBody("bets"), (req, res) => {
   let userId;
   try {
     let token = req.headers["authorization"];
@@ -60,18 +50,7 @@ router.post("/", (req, res) => {
                 if (!odds) {
                   return res.status(404).send({ error: "Odds not found" });
                 }
-                let multiplier;
-                switch (req.body.prediction) {
-                  case "w1":
-                    multiplier = odds.home_win;
-                    break;
-                  case "w2":
-                    multiplier = odds.away_win;
-                    break;
-                  case "x":
-                    multiplier = odds.draw;
-                    break;
-                }
+                let multiplier = multiplierCount(req.body.prediction);
                 db("bet")
                   .insert({
                     ...req.body,
@@ -88,27 +67,8 @@ router.post("/", (req, res) => {
                       })
                       .then(() => {
                         statEmitter.emit("newBet");
-                        [
-                          "bet_amount",
-                          "event_id",
-                          "away_team",
-                          "home_team",
-                          "odds_id",
-                          "start_at",
-                          "updated_at",
-                          "created_at",
-                          "user_id",
-                        ].forEach((whatakey) => {
-                          var index = whatakey.indexOf("_");
-                          var newKey = whatakey.replace("_", "");
-                          newKey = newKey.split("");
-                          newKey[index] = newKey[index].toUpperCase();
-                          newKey = newKey.join("");
-                          bet[newKey] = bet[whatakey];
-                          delete bet[whatakey];
-                        });
                         return res.send({
-                          ...bet,
+                          ...camelCaseIndexes(bet),
                           currentBalance: currentBalance,
                         });
                       });

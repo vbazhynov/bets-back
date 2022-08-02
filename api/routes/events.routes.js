@@ -1,29 +1,11 @@
 import { Router } from "express";
 const router = Router();
+import { validateBody } from "../../middleware/validator/validator.js";
+import jwt from "jsonwebtoken";
+import { db, statEmitter } from "../../index.js";
+import { camelCaseIndexes } from "../../helpers/camelCaseIndexes.js";
 
-router.post("/", (req, res) => {
-  var schema = joi
-    .object({
-      id: joi.string().uuid(),
-      type: joi.string().required(),
-      homeTeam: joi.string().required(),
-      awayTeam: joi.string().required(),
-      startAt: joi.date().required(),
-      odds: joi
-        .object({
-          homeWin: joi.number().min(1.01).required(),
-          awayWin: joi.number().min(1.01).required(),
-          draw: joi.number().min(1.01).required(),
-        })
-        .required(),
-    })
-    .required();
-  var isValidResult = schema.validate(req.body);
-  if (isValidResult.error) {
-    res.status(400).send({ error: isValidResult.error.details[0].message });
-    return;
-  }
-
+router.post("/", validateBody("events"), (req, res) => {
   try {
     let token = req.headers["authorization"];
     if (!token) {
@@ -62,24 +44,7 @@ router.post("/", (req, res) => {
           .returning("*")
           .then(([event]) => {
             statEmitter.emit("newEvent");
-            [
-              "bet_amount",
-              "event_id",
-              "away_team",
-              "home_team",
-              "odds_id",
-              "start_at",
-              "updated_at",
-              "created_at",
-            ].forEach((whatakey) => {
-              var index = whatakey.indexOf("_");
-              var newKey = whatakey.replace("_", "");
-              newKey = newKey.split("");
-              newKey[index] = newKey[index].toUpperCase();
-              newKey = newKey.join("");
-              event[newKey] = event[whatakey];
-              delete event[whatakey];
-            });
+
             ["home_win", "away_win", "created_at", "updated_at"].forEach(
               (whatakey) => {
                 var index = whatakey.indexOf("_");
@@ -92,7 +57,7 @@ router.post("/", (req, res) => {
               }
             );
             return res.send({
-              ...event,
+              ...camelCaseIndexes(event),
               odds,
             });
           });
@@ -104,18 +69,7 @@ router.post("/", (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
-  var schema = joi
-    .object({
-      score: joi.string().required(),
-    })
-    .required();
-  var isValidResult = schema.validate(req.body);
-  if (isValidResult.error) {
-    res.status(400).send({ error: isValidResult.error.details[0].message });
-    return;
-  }
-
+router.put("/:id", validateBody("eventsId"), (req, res) => {
   try {
     let token = req.headers["authorization"];
     if (!token) {
@@ -176,25 +130,7 @@ router.put("/:id", (req, res) => {
               })
             );
             setTimeout(() => {
-              [
-                "bet_amount",
-                "event_id",
-                "away_team",
-                "home_team",
-                "odds_id",
-                "start_at",
-                "updated_at",
-                "created_at",
-              ].forEach((whatakey) => {
-                var index = whatakey.indexOf("_");
-                var newKey = whatakey.replace("_", "");
-                newKey = newKey.split("");
-                newKey[index] = newKey[index].toUpperCase();
-                newKey = newKey.join("");
-                event[newKey] = event[whatakey];
-                delete event[whatakey];
-              });
-              res.send(event);
+              res.send(camelCaseIndexes(event));
             }, 1000);
           });
       });

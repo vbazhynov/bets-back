@@ -1,22 +1,9 @@
 import { Router } from "express";
+import { validateBody } from "../../middleware/validator/validator.js";
 
 const router = Router();
 
-router.post("/", (req, res) => {
-  var schema = joi
-    .object({
-      id: joi.string().uuid(),
-      userId: joi.string().uuid().required(),
-      cardNumber: joi.string().required(),
-      amount: joi.number().min(0).required(),
-    })
-    .required();
-  var isValidResult = schema.validate(req.body);
-  if (isValidResult.error) {
-    res.status(400).send({ error: isValidResult.error.details[0].message });
-    return;
-  }
-
+router.post("/", validateBody("transactions"), (req, res) => {
   let token = req.headers["authorization"];
   if (!token) {
     return res.status(401).send({ error: "Not Authorized" });

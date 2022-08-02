@@ -13,4 +13,4 @@ const eventsSchema = Joi.object({
   }).required(),
 }).required();
 
-export default eventsSchema;
+export { eventsSchema };

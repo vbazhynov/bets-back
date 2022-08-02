@@ -1,21 +1,17 @@
 import joi from "joi";
 import { Router } from "express";
 import { db } from "../../index.js";
+import jwt from "jsonwebtoken";
+import { statEmitter } from "../../index.js";
+import {
+  validateBody,
+  validateParams,
+} from "../../middleware/validator/validator.js";
 
 const router = Router();
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validateParams("usersId"), (req, res) => {
   try {
-    var schema = joi
-      .object({
-        id: joi.string().uuid(),
-      })
-      .required();
-    var isValidResult = schema.validate(req.params);
-    if (isValidResult.error) {
-      res.status(400).send({ error: isValidResult.error.details[0].message });
-      return;
-    }
     db("user")
       .where("id", req.params.id)
       .returning("*")
@@ -35,26 +31,10 @@ router.get("/:id", (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
-  var schema = joi
-    .object({
-      id: joi.string().uuid(),
-      type: joi.string().required(),
-      email: joi.string().email().required(),
-      phone: joi
-        .string()
-        .pattern(/^\+?3?8?(0\d{9})$/)
-        .required(),
-      name: joi.string().required(),
-      city: joi.string(),
-    })
-    .required();
-  var isValidResult = schema.validate(req.body);
-  if (isValidResult.error) {
-    res.status(400).send({ error: isValidResult.error.details[0].message });
-    return;
-  }
+router.post("/", validateBody("users"), (req, res) => {
   req.body.balance = 0;
+
+  console.log(req.body);
   db("user")
     .insert(req.body)
     .returning("*")
@@ -63,6 +43,12 @@ router.post("/", (req, res) => {
       delete result.created_at;
       result.updatedAt = result.updated_at;
       delete result.updated_at;
+      console.log(result);
+      token = jwt.sign(
+        { id: result.id, type: result.type },
+        process.env.JWT_SECRET
+      );
+      console.log(token);
       statEmitter.emit("newUser");
       return res.send({
         ...result,

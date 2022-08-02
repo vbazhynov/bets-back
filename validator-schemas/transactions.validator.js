@@ -1,10 +1,9 @@
-const transactionsSchema = joi
-  .object({
-    id: joi.string().uuid(),
-    userId: joi.string().uuid().required(),
-    cardNumber: joi.string().required(),
-    amount: joi.number().min(0).required(),
-  })
-  .required();
+import Joi from "joi";
+const transactionsSchema = Joi.object({
+  id: Joi.string().uuid(),
+  userId: Joi.string().uuid().required(),
+  cardNumber: Joi.string().required(),
+  amount: Joi.number().min(0).required(),
+}).required();
 
-export default transactionsSchema;
+export { transactionsSchema };

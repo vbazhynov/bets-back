@@ -1,16 +1,17 @@
 import express, { Router } from "express";
 import knex from "knex";
+import knexfile from "knexfile";
 import jwt from "jsonwebtoken";
 import joi from "joi";
 import ee from "events";
-import { dbConfig } from "./knexfile.js";
+import { dbConfig } from "./1.js";
 import routes from "./api/routes/index.js";
 
 const app = express();
 
 const port = 3000;
 
-const statEmitter = new ee();
+export const statEmitter = new ee();
 const stats = {
   totalUsers: 3,
   totalBets: 1,
@@ -20,7 +21,7 @@ const stats = {
 export let db;
 app.use(express.json());
 app.use((uselessRequest, uselessResponse, neededNext) => {
-  db = knex(dbConfig.development);
+  db = knex(knexfile.development);
   db.raw("select 1+1 as result")
     .then(function () {
       neededNext();

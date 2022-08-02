@@ -7,4 +7,4 @@ const betsSchema = Joi.object({
   prediction: Joi.string().valid("w1", "w2", "x").required(),
 }).required();
 
-export default betsSchema;
+export { betsSchema };
