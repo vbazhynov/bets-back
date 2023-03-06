@@ -1,4 +1,3 @@
-import Joi from "joi";
 import * as validators from "../../validator-schemas/index.js";
 import createError from "http-errors";
 

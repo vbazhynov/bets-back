@@ -1,8 +1,8 @@
-const chai = require("chai");
-const chaiHttp = require("chai-http");
-const jwt = require("jsonwebtoken");
+import chai from "chai";
+import chaiHttp from "chai-http";
+import jwt from "jsonwebtoken";
 
-const { app } = require("../index");
+import { app } from "../index";
 const { expect } = chai;
 
 console.log = () => {};

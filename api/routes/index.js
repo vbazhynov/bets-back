@@ -4,6 +4,7 @@ import statsRoute from "./stats.routes.js";
 import transactionRoute from "./transactions.routes.js";
 import eventsRoute from "./events.routes.js";
 import betsRoute from "./bets.routes.js";
+
 export default (app) => {
   app.use("/health", healthRoute);
   app.use("/users", usersRoute);

@@ -16,6 +16,7 @@ const stats = {
   totalBets: 1,
   totalEvents: 1,
 };
+routes(app);
 
 export let db;
 app.use(express.json());
@@ -29,8 +30,6 @@ app.use((uselessRequest, uselessResponse, neededNext) => {
       throw new Error("No db connection");
     });
 });
-
-routes(app);
 
 app.listen(port, () => {
   statEmitter.on("newUser", () => {

@@ -1,5 +1,5 @@
-expo("./user.test");
-require("./bet.test");
-require("./event.test");
-require("./transaction.test");
-require("./stats.test");
+import("./user.test");
+import("./bet.test");
+import("./event.test");
+import("./transaction.test");
+import("./stats.test");

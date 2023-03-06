@@ -13,7 +13,7 @@
     "migrate:latest": "knex migrate:latest",
     "seed": "knex seed:run",
     "reset:db": "knex migrate:rollback && npm run migrate:latest && npm run seed",
-    "test": "npm run reset:db && mocha ./tests/index.test.js --exit",
+    "test": "npm run reset:db && mocha -r esm ./tests/index.test.js --exit",
     "docker:test:db": "docker-compose -f docker-compose.test.yml up -d hw_db_test",
     "docker:test": "docker-compose -f docker-compose.test.yml up hm_test"
   },
